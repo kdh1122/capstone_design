@@ -627,8 +627,28 @@ def get_post_javascript_data():
         model = tf.keras.models.load_model('my_model.h5')
         preds = model.predict(x)
     mountain_list = [request.form.get(f'mountains[{i}]', 0) for i in range(int(max_list))]
-    values = preds[:, 1] / preds[:, 0] * 0.2  #+ preds[:, 2] / preds[:, 0] * 0.8
-    list_value = values.tolist()
+    
+    # 사고가 발생한 데이터 수와 발생하지 않은 데이터 수
+    n_accident = len(preds[preds[:, 1] >= 0.5])
+    n_no_accident = len(preds[preds[:, 0] >= 0.5])
+
+    # 데이터의 전체 수
+    n_total = n_accident + n_no_accident
+
+    # P(A|B) = P(B|A)P(A) / P(B)
+    prior_prob = n_accident / n_total
+    p_b_given_a = preds[:, 1].mean() # 예측 확률 벡터에서 사고 발생 확률 평균
+    p_b_given_not_a = preds[:, 0].mean() # 예측 확률 벡터에서 사고 미발생 확률 평균
+
+    # P(B) : 데이터가 이와 같이 나올 확률
+    p_b = p_b_given_a * prior_prob + p_b_given_not_a * (1 - prior_prob)
+
+    # P(A|B) : 사고가 발생할 확률(posterior probability)
+    posterior_prob = p_b_given_a * prior_prob / p_b
+    
+    values2 = posterior_prob
+    
+    list_value = values2.tolist()
     list_weight = [df_mountains.loc[i, 'weight'] if i in df_mountains.index else 0.018298748185446165 for i in
                    mountain_list]
     result_array = np.array(list_value) * np.array(list_weight)

@@ -9,8 +9,6 @@ function weather_func(lat, lon,mountain){
     var time =[];
     var moutain_obj = Object.assign({},mountain);
 
-
-
     timestamp = new Date().getTime();
 
     for ( var k=0; k<lat.length; k++ ) {
@@ -19,7 +17,8 @@ function weather_func(lat, lon,mountain){
         //let apiURI ="https://api.openweathermap.org/data/3.0/forecast?lat="+lat[k]+"&lon="+lon[k]+"&appid="+appid;
 
         //api 수정된 부분 -> 각자 api 키가 다를 수 있어서 openweathermap에서 api 키 부여받으시고 하시면 돼요!! 저는 freemium 인걸루 다운 받았어요
-        let apiURI = "http://api.openweathermap.org/data/2.5/forecast?id=524901"+"&appid="+appid;
+        let apiURI = "https://api.openweathermap.org/data/2.5/forecast?lat="+lat[k]+"&lon="+lon[k]+"&appid="+appid;
+        
         let counter = 1;
 
         $.ajax({
